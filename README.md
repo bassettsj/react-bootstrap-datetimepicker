@@ -1,7 +1,9 @@
 react-bootstrap-datetimepicker
 ===============================
 
-This project is a port of https://github.com/Eonasdan/bootstrap-datetimepicker for React.js
+[![Build Status](https://travis-ci.org/bassettsj/react-bootstrap-datetimepicker.svg?branch=master)](https://travis-ci.org/bassettsj/react-bootstrap-datetimepicker)
+
+> This project is a port of https://github.com/Eonasdan/bootstrap-datetimepicker for React.js.
 
 Usage
 ===============================
