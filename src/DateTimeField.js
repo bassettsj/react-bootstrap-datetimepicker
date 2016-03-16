@@ -37,12 +37,14 @@ export default class DateTimeField extends Component {
     ]),
     onChange: PropTypes.func,
     format: PropTypes.string,
+    inputAddonProps: PropTypes.object,
     inputProps: PropTypes.object,
     inputFormat: PropTypes.string,
     defaultText: PropTypes.string,
     mode: PropTypes.oneOf([Constants.MODE_DATE, Constants.MODE_DATETIME, Constants.MODE_TIME]),
     minDate: PropTypes.object,
     maxDate: PropTypes.object,
+    showPicker: PropTypes.bool,
     direction: PropTypes.string,
     showToday: PropTypes.bool,
     viewMode: PropTypes.string,
@@ -78,6 +80,7 @@ export default class DateTimeField extends Component {
       state.selectedDate = moment(nextProps.dateTime, nextProps.format, true);
       state.inputValue = moment(nextProps.dateTime, nextProps.format, true).format(nextProps.inputFormat ? nextProps.inputFormat : this.state.inputFormat);
     }
+
     return this.setState(state);
   }
 
@@ -254,48 +257,19 @@ export default class DateTimeField extends Component {
     });
   }
 
+
+  showPicker = () => {
+    this.setState({
+      ...this.state,
+      showPicker: true
+    });
+  }
+
   onClick = () => {
-    let classes, gBCR, offset, placePosition, scrollTop, styles;
     if (this.state.showPicker) {
       return this.closePicker();
     } else {
-      this.setState({
-        showPicker: true
-      });
-      gBCR = this.refs.dtpbutton.getBoundingClientRect();
-      classes = {
-        "bootstrap-datetimepicker-widget": true,
-        "dropdown-menu": true
-      };
-      offset = {
-        top: gBCR.top + window.pageYOffset - document.documentElement.clientTop,
-        left: gBCR.left + window.pageXOffset - document.documentElement.clientLeft
-      };
-      offset.top = offset.top + this.refs.datetimepicker.offsetHeight;
-      scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-      placePosition = this.props.direction === "up" ? "top" : this.props.direction === "bottom" ? "bottom" : this.props.direction === "auto" ? offset.top + this.refs.widget.offsetHeight > window.offsetHeight + scrollTop && this.refs.widget.offsetHeight + this.refs.datetimepicker.offsetHeight > offset.top ? "top" : "bottom" : void 0;
-      if (placePosition === "top") {
-        offset.top = -this.refs.widget.offsetHeight - this.clientHeight - 2;
-        classes.top = true;
-        classes.bottom = false;
-        classes["pull-right"] = true;
-      } else {
-        offset.top = 40;
-        classes.top = false;
-        classes.bottom = true;
-        classes["pull-right"] = true;
-      }
-      styles = {
-        display: "block",
-        position: "absolute",
-        top: offset.top,
-        left: "auto",
-        right: 40
-      };
-      return this.setState({
-        widgetStyle: styles,
-        widgetClasses: classes
-      });
+      return this.showPicker();
     }
   }
 
@@ -336,10 +310,77 @@ export default class DateTimeField extends Component {
     }
   }
 
+
+  canCalculateStyes = () => {
+    if (this.refs.hasOwnProperty("dtpbutton")) {
+      if ((this.isControlledPicker && this.props.showPicker) || this.state.showPicker) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getWidgetStyles = () => {
+    if (this.canCalculateStyes()) {
+      const gBCR = this.refs.dtpbutton.getBoundingClientRect();
+      const widgetClasses = {
+        "bootstrap-datetimepicker-widget": true,
+        "dropdown-menu": true
+      };
+      const offset = {
+        top: gBCR.top + window.pageYOffset - document.documentElement.clientTop,
+        left: gBCR.left + window.pageXOffset - document.documentElement.clientLeft
+      };
+      offset.top = offset.top + this.refs.datetimepicker.offsetHeight;
+      const scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+      const placePosition = this.props.direction === "up" ? "top" : this.props.direction === "bottom" ? "bottom" : this.props.direction === "auto" ? offset.top + this.refs.widget.offsetHeight > window.offsetHeight + scrollTop && this.refs.widget.offsetHeight + this.refs.datetimepicker.offsetHeight > offset.top ? "top" : "bottom" : void 0;
+      if (placePosition === "top") {
+        offset.top = -this.refs.widget.offsetHeight - this.clientHeight - 2;
+        widgetClasses.top = true;
+        widgetClasses.bottom = false;
+        widgetClasses["pull-right"] = true;
+      } else {
+        offset.top = 40;
+        widgetClasses.top = false;
+        widgetClasses.bottom = true;
+        widgetClasses["pull-right"] = true;
+      }
+      const widgetStyle = {
+        display: "block",
+        position: "absolute",
+        top: offset.top,
+        left: "auto",
+        right: 40
+      };
+      return {
+        widgetStyle,
+        widgetClasses
+      };
+    } else {
+      return {
+        widgetClasses: {},
+        widgetStyle: {
+          left: -9999,
+          display: "none"
+        }
+      };
+    }
+  }
+
+  componentDidMount() {
+    if (this.isControlledPicker && this.props.showPicker) {
+      this.forceUpdate();
+    }
+  }
+  get isControlledPicker() {
+    return this.props.hasOwnProperty("showPicker");
+  }
   render() {
+    const { isControlledPicker } = this;
+    const overlay = isControlledPicker ? null : this.renderOverlay();
     return (
           <div>
-            {this.renderOverlay()}
+            {overlay}
             <DateTimePicker
                   addDecade={this.addDecade}
                   addHour={this.addHour}
@@ -369,12 +410,11 @@ export default class DateTimeField extends Component {
                   togglePicker={this.togglePicker}
                   viewDate={this.state.viewDate}
                   viewMode={this.props.viewMode}
-                  widgetClasses={this.state.widgetClasses}
-                  widgetStyle={this.state.widgetStyle}
+                  {...this.getWidgetStyles()}
             />
             <div className={"input-group date " + this.size()} ref="datetimepicker">
               <input className="form-control" onChange={this.onChange} type="text" value={this.state.inputValue} {...this.props.inputProps}/>
-              <span className="input-group-addon" onBlur={this.onBlur} onClick={this.onClick} ref="dtpbutton">
+              <span className="input-group-addon" onClick={this.onClick} ref="dtpbutton" {...this.props.inputAddonProps}>
                 <span className={classnames("glyphicon", this.state.buttonIcon)} />
               </span>
             </div>
@@ -382,4 +422,3 @@ export default class DateTimeField extends Component {
     );
   }
 }
-
