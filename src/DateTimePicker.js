@@ -100,7 +100,7 @@ export default class DateTimePicker extends Component {
 
   render() {
     return (
-      <div className={classnames(this.props.widgetClasses)} style={this.props.widgetStyle}>
+      <div className={classnames(this.props.widgetClasses)} style={this.props.widgetStyle} ref="container">
 
         <ul className="list-unstyled">
 
@@ -117,4 +117,3 @@ export default class DateTimePicker extends Component {
     );
   }
 }
-

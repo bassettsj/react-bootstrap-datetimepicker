@@ -63,7 +63,11 @@ describe("DateTimeField", function() {
       expect(input.value).toBe("Pick a date");
     });
 
-
+    it("opens opent eh ", function() {
+      const component = TestUtils.renderIntoDocument(<DateTimeField showPicker={true} />);
+      component.forceUpdate();
+      const pickerElement = TestUtils.findRenderedDOMComponentWithClass(component, "bootstrap-datetimepicker-widget");
+    });
   });
 
 });

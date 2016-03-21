@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from "react";
 import moment from "moment";
-import classnames from "classnames";
 import DateTimePicker from "./DateTimePicker.js";
 import Constants from "./Constants.js";
 
@@ -15,7 +14,8 @@ export default class DateTimeField extends Component {
     mode: Constants.MODE_DATETIME,
     onChange: (x) => {
       console.log(x);
-    }
+    },
+    containerClassName: "c_form-group"
   }
 
   resolvePropsInputFormat = () => {
@@ -37,7 +37,6 @@ export default class DateTimeField extends Component {
     ]),
     onChange: PropTypes.func,
     format: PropTypes.string,
-    inputAddonProps: PropTypes.object,
     inputProps: PropTypes.object,
     inputFormat: PropTypes.string,
     defaultText: PropTypes.string,
@@ -49,7 +48,8 @@ export default class DateTimeField extends Component {
     showToday: PropTypes.bool,
     viewMode: PropTypes.string,
     size: PropTypes.oneOf([Constants.SIZE_SMALL, Constants.SIZE_MEDIUM, Constants.SIZE_LARGE]),
-    daysOfWeekDisabled: PropTypes.arrayOf(PropTypes.number)
+    daysOfWeekDisabled: PropTypes.arrayOf(PropTypes.number),
+    containerClassName: PropTypes.string
   }
 
   state = {
@@ -274,12 +274,8 @@ export default class DateTimeField extends Component {
   }
 
   closePicker = () => {
-    let style = {...this.state.widgetStyle};
-    style.left = -9999;
-    style.display = "none";
     return this.setState({
-      showPicker: false,
-      widgetStyle: style
+      showPicker: false
     });
   }
 
@@ -312,7 +308,7 @@ export default class DateTimeField extends Component {
 
 
   canCalculateStyes = () => {
-    if (this.refs.hasOwnProperty("dtpbutton")) {
+    if (this.refs.hasOwnProperty("field")) {
       if ((this.isControlledPicker && this.props.showPicker) || this.state.showPicker) {
         return true;
       }
@@ -322,7 +318,7 @@ export default class DateTimeField extends Component {
 
   getWidgetStyles = () => {
     if (this.canCalculateStyes()) {
-      const gBCR = this.refs.dtpbutton.getBoundingClientRect();
+      const gBCR = this.refs.field.getBoundingClientRect();
       const widgetClasses = {
         "bootstrap-datetimepicker-widget": true,
         "dropdown-menu": true
@@ -412,13 +408,10 @@ export default class DateTimeField extends Component {
                   viewMode={this.props.viewMode}
                   {...this.getWidgetStyles()}
             />
-            <div className={"input-group date " + this.size()} ref="datetimepicker">
-              <input className="form-control" onChange={this.onChange} type="text" value={this.state.inputValue} {...this.props.inputProps}/>
-              <span className="input-group-addon" onClick={this.onClick} ref="dtpbutton" {...this.props.inputAddonProps}>
-                <span className={classnames("glyphicon", this.state.buttonIcon)} />
-              </span>
-            </div>
+          <div className={this.props.containerClassName + this.size()} ref="datetimepicker">
+            <input onChange={this.onChange} onFocus={this.showPicker} ref="field" type="text" value={this.state.inputValue} {...this.props.inputProps} />
           </div>
+        </div>
     );
   }
 }
