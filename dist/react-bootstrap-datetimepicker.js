@@ -87,11 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _moment2 = _interopRequireDefault(_moment);
 
-	var _classnames = __webpack_require__(40);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _DateTimePickerJs = __webpack_require__(41);
+	var _DateTimePickerJs = __webpack_require__(40);
 
 	var _DateTimePickerJs2 = _interopRequireDefault(_DateTimePickerJs);
 
@@ -151,6 +147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        state.selectedDate = (0, _moment2["default"])(nextProps.dateTime, nextProps.format, true);
 	        state.inputValue = (0, _moment2["default"])(nextProps.dateTime, nextProps.format, true).format(nextProps.inputFormat ? nextProps.inputFormat : _this.state.inputFormat);
 	      }
+
 	      return _this.setState(state);
 	    };
 
@@ -323,63 +320,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    };
 
+	    this.showPicker = function () {
+	      _this.setState(_extends({}, _this.state, {
+	        showPicker: true
+	      }));
+	    };
+
 	    this.onClick = function () {
-	      var classes = undefined,
-	          gBCR = undefined,
-	          offset = undefined,
-	          placePosition = undefined,
-	          scrollTop = undefined,
-	          styles = undefined;
 	      if (_this.state.showPicker) {
 	        return _this.closePicker();
 	      } else {
-	        _this.setState({
-	          showPicker: true
-	        });
-	        gBCR = _this.refs.dtpbutton.getBoundingClientRect();
-	        classes = {
-	          "bootstrap-datetimepicker-widget": true,
-	          "dropdown-menu": true
-	        };
-	        offset = {
-	          top: gBCR.top + window.pageYOffset - document.documentElement.clientTop,
-	          left: gBCR.left + window.pageXOffset - document.documentElement.clientLeft
-	        };
-	        offset.top = offset.top + _this.refs.datetimepicker.offsetHeight;
-	        scrollTop = window.pageYOffset !== undefined ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-	        placePosition = _this.props.direction === "up" ? "top" : _this.props.direction === "bottom" ? "bottom" : _this.props.direction === "auto" ? offset.top + _this.refs.widget.offsetHeight > window.offsetHeight + scrollTop && _this.refs.widget.offsetHeight + _this.refs.datetimepicker.offsetHeight > offset.top ? "top" : "bottom" : void 0;
-	        if (placePosition === "top") {
-	          offset.top = -_this.refs.widget.offsetHeight - _this.clientHeight - 2;
-	          classes.top = true;
-	          classes.bottom = false;
-	          classes["pull-right"] = true;
-	        } else {
-	          offset.top = 40;
-	          classes.top = false;
-	          classes.bottom = true;
-	          classes["pull-right"] = true;
-	        }
-	        styles = {
-	          display: "block",
-	          position: "absolute",
-	          top: offset.top,
-	          left: "auto",
-	          right: 40
-	        };
-	        return _this.setState({
-	          widgetStyle: styles,
-	          widgetClasses: classes
-	        });
+	        return _this.showPicker();
 	      }
 	    };
 
 	    this.closePicker = function () {
-	      var style = _extends({}, _this.state.widgetStyle);
-	      style.left = -9999;
-	      style.display = "none";
 	      return _this.setState({
-	        showPicker: false,
-	        widgetStyle: style
+	        showPicker: false
 	      });
 	    };
 
@@ -409,16 +366,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _react2["default"].createElement("span", null);
 	      }
 	    };
+
+	    this.canCalculateStyes = function () {
+	      if (_this.refs.hasOwnProperty("dateField")) {
+	        if (_this.isControlledPicker && _this.props.showPicker || _this.state.showPicker) {
+	          return true;
+	        }
+	      }
+	      return false;
+	    };
+
+	    this.getWidgetStyles = function () {
+	      if (_this.canCalculateStyes()) {
+	        var gBCR = _this.refs.dateField.getBoundingClientRect();
+	        var widgetClasses = {
+	          "bootstrap-datetimepicker-widget": true,
+	          "dropdown-menu": true
+	        };
+	        var offset = {
+	          top: gBCR.top + window.pageYOffset - document.documentElement.clientTop,
+	          left: gBCR.left + window.pageXOffset - document.documentElement.clientLeft
+	        };
+	        offset.top = offset.top + _this.refs.datetimepicker.offsetHeight;
+	        var scrollTop = window.pageYOffset !== undefined ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+	        var placePosition = _this.props.direction === "up" ? "top" : _this.props.direction === "bottom" ? "bottom" : _this.props.direction === "auto" ? offset.top + _this.refs.widget.offsetHeight > window.offsetHeight + scrollTop && _this.refs.widget.offsetHeight + _this.refs.datetimepicker.offsetHeight > offset.top ? "top" : "bottom" : void 0;
+	        if (placePosition === "top") {
+	          offset.top = -_this.refs.widget.offsetHeight - _this.clientHeight - 2;
+	          widgetClasses.top = true;
+	          widgetClasses.bottom = false;
+	          widgetClasses["pull-right"] = true;
+	        } else {
+	          offset.top = 40;
+	          widgetClasses.top = false;
+	          widgetClasses.bottom = true;
+	          widgetClasses["pull-right"] = true;
+	        }
+	        var widgetStyle = {
+	          display: "block",
+	          position: "absolute",
+	          top: offset.top,
+	          left: "auto",
+	          right: 40
+	        };
+	        return {
+	          widgetStyle: widgetStyle,
+	          widgetClasses: widgetClasses
+	        };
+	      } else {
+	        return {
+	          widgetClasses: {},
+	          widgetStyle: {
+	            left: -9999,
+	            display: "none"
+	          }
+	        };
+	      }
+	    };
 	  }
 
 	  _createClass(DateTimeField, [{
+	    key: "componentDidMount",
+	    value: function componentDidMount() {
+	      if (this.isControlledPicker && this.props.showPicker) {
+	        this.forceUpdate();
+	      }
+	    }
+	  }, {
 	    key: "render",
 	    value: function render() {
+	      var isControlledPicker = this.isControlledPicker;
+
+	      var overlay = isControlledPicker ? null : this.renderOverlay();
 	      return _react2["default"].createElement(
 	        "div",
-	        null,
-	        this.renderOverlay(),
-	        _react2["default"].createElement(_DateTimePickerJs2["default"], {
+	        { style: { position: "relative" } },
+	        overlay,
+	        _react2["default"].createElement(_DateTimePickerJs2["default"], _extends({
 	          addDecade: this.addDecade,
 	          addHour: this.addHour,
 	          addMinute: this.addMinute,
@@ -446,21 +469,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	          togglePeriod: this.togglePeriod,
 	          togglePicker: this.togglePicker,
 	          viewDate: this.state.viewDate,
-	          viewMode: this.props.viewMode,
-	          widgetClasses: this.state.widgetClasses,
-	          widgetStyle: this.state.widgetStyle
-	        }),
+	          viewMode: this.props.viewMode
+	        }, this.getWidgetStyles())),
 	        _react2["default"].createElement(
 	          "div",
-	          { className: "input-group date " + this.size(), ref: "datetimepicker" },
-	          _react2["default"].createElement("input", _extends({ className: "form-control", onChange: this.onChange, type: "text", value: this.state.inputValue }, this.props.inputProps)),
+	          { className: this.props.containerClassName + this.size(), ref: "datetimepicker" },
 	          _react2["default"].createElement(
-	            "span",
-	            { className: "input-group-addon", onBlur: this.onBlur, onClick: this.onClick, ref: "dtpbutton" },
-	            _react2["default"].createElement("span", { className: (0, _classnames2["default"])("glyphicon", this.state.buttonIcon) })
-	          )
+	            "label",
+	            _extends({ htmlFor: this.props.id }, this.props.labelProps),
+	            this.props.label
+	          ),
+	          _react2["default"].createElement("input", _extends({ onChange: this.onChange, onFocus: this.showPicker, ref: "dateField", type: "text", value: this.state.inputValue, id: this.props.id }, this.props.inputProps))
 	        )
 	      );
+	    }
+	  }, {
+	    key: "isControlledPicker",
+	    get: function get() {
+	      return this.props.hasOwnProperty("showPicker");
 	    }
 	  }], [{
 	    key: "defaultProps",
@@ -474,7 +500,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mode: _ConstantsJs2["default"].MODE_DATETIME,
 	      onChange: function onChange(x) {
 	        console.log(x);
-	      }
+	      },
+	      containerClassName: "c_form-group"
 	    },
 	    enumerable: true
 	  }, {
@@ -489,11 +516,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mode: _react.PropTypes.oneOf([_ConstantsJs2["default"].MODE_DATE, _ConstantsJs2["default"].MODE_DATETIME, _ConstantsJs2["default"].MODE_TIME]),
 	      minDate: _react.PropTypes.object,
 	      maxDate: _react.PropTypes.object,
+	      showPicker: _react.PropTypes.bool,
 	      direction: _react.PropTypes.string,
 	      showToday: _react.PropTypes.bool,
 	      viewMode: _react.PropTypes.string,
 	      size: _react.PropTypes.oneOf([_ConstantsJs2["default"].SIZE_SMALL, _ConstantsJs2["default"].SIZE_MEDIUM, _ConstantsJs2["default"].SIZE_LARGE]),
-	      daysOfWeekDisabled: _react.PropTypes.arrayOf(_react.PropTypes.number)
+	      daysOfWeekDisabled: _react.PropTypes.arrayOf(_react.PropTypes.number),
+	      containerClassName: _react.PropTypes.string,
+	      label: _react.PropTypes.string.isRequired,
+	      id: _react.PropTypes.string.isRequired,
+	      labelProps: _react.PropTypes.object
 	    },
 	    enumerable: true
 	  }]);
@@ -1064,60 +1096,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2015 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = '';
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes += ' ' + arg;
-				} else if (Array.isArray(arg)) {
-					classes += ' ' + classNames.apply(null, arg);
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes += ' ' + key;
-						}
-					}
-				}
-			}
-
-			return classes.substr(1);
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	}());
-
-
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
 	"use strict";
 
 	var _get = __webpack_require__(2)["default"];
@@ -1138,7 +1116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(40);
+	var _classnames = __webpack_require__(41);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -1230,7 +1208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function render() {
 	      return _react2["default"].createElement(
 	        "div",
-	        { className: (0, _classnames2["default"])(this.props.widgetClasses), style: this.props.widgetStyle },
+	        { className: (0, _classnames2["default"])(this.props.widgetClasses), style: this.props.widgetStyle, ref: "container" },
 	        _react2["default"].createElement(
 	          "ul",
 	          { className: "list-unstyled" },
@@ -1281,6 +1259,60 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports["default"] = DateTimePicker;
 	module.exports = exports["default"];
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
 
 /***/ },
 /* 42 */
@@ -1524,7 +1556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _moment2 = _interopRequireDefault(_moment);
 
-	var _classnames = __webpack_require__(40);
+	var _classnames = __webpack_require__(41);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -1729,7 +1761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(40);
+	var _classnames = __webpack_require__(41);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -1860,7 +1892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(40);
+	var _classnames = __webpack_require__(41);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
