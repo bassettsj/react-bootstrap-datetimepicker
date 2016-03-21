@@ -49,7 +49,10 @@ export default class DateTimeField extends Component {
     viewMode: PropTypes.string,
     size: PropTypes.oneOf([Constants.SIZE_SMALL, Constants.SIZE_MEDIUM, Constants.SIZE_LARGE]),
     daysOfWeekDisabled: PropTypes.arrayOf(PropTypes.number),
-    containerClassName: PropTypes.string
+    containerClassName: PropTypes.string,
+    label: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    labelProps: PropTypes.object
   }
 
   state = {
@@ -308,7 +311,7 @@ export default class DateTimeField extends Component {
 
 
   canCalculateStyes = () => {
-    if (this.refs.hasOwnProperty("field")) {
+    if (this.refs.hasOwnProperty("dateField")) {
       if ((this.isControlledPicker && this.props.showPicker) || this.state.showPicker) {
         return true;
       }
@@ -318,7 +321,7 @@ export default class DateTimeField extends Component {
 
   getWidgetStyles = () => {
     if (this.canCalculateStyes()) {
-      const gBCR = this.refs.field.getBoundingClientRect();
+      const gBCR = this.refs.dateField.getBoundingClientRect();
       const widgetClasses = {
         "bootstrap-datetimepicker-widget": true,
         "dropdown-menu": true
@@ -375,7 +378,7 @@ export default class DateTimeField extends Component {
     const { isControlledPicker } = this;
     const overlay = isControlledPicker ? null : this.renderOverlay();
     return (
-          <div>
+          <div style={{ position: "relative" }}>
             {overlay}
             <DateTimePicker
                   addDecade={this.addDecade}
@@ -409,7 +412,8 @@ export default class DateTimeField extends Component {
                   {...this.getWidgetStyles()}
             />
           <div className={this.props.containerClassName + this.size()} ref="datetimepicker">
-            <input onChange={this.onChange} onFocus={this.showPicker} ref="field" type="text" value={this.state.inputValue} {...this.props.inputProps} />
+            <label htmlFor={this.props.id} {...this.props.labelProps}>{this.props.label}</label>
+            <input onChange={this.onChange} onFocus={this.showPicker} ref="dateField" type="text" value={this.state.inputValue} id={this.props.id} {...this.props.inputProps} />
           </div>
         </div>
     );
